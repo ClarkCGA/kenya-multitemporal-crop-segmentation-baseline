@@ -10,7 +10,6 @@ from utils import load_data
 from image_augmentation import *
 from IPython.core.debugger import set_trace
 
-
 class CropData(Dataset):
     r"""
     Create an iterable dataset of image chips
@@ -34,7 +33,7 @@ class CropData(Dataset):
                              for each band. If not provided, these values will be calculated from the data.
         trans (list of str): Transformation or data augmentation methods; list 
                              elements could be chosen from:
-                             ['v_flip','h_flip','d_flip','rotate','resize','shift_brightness']
+                             ['v_flip','h_flip','d_flip','rotate','resize','shift_brightness','random_crop']
         **kwargs (dict, optional): Additional parameters for the specified transformation methods. 
                         These can include:
                              - scale_factor (tuple): Scaling factor for the 'resize' transformation 
@@ -72,15 +71,17 @@ class CropData(Dataset):
         #flag_ids = [item for item in flag_ids_unrefined if item not in bad_tiles]
 
         img_fnames = [Path(dirpath) / f
-                      for (dirpath, dirnames, filenames) in os.walk(Path(src_dir) / self.dataset_name) 
+                      for (dirpath, dirnames, filenames) in os.walk(Path(src_dir) / self.dataset_name / 'images')
                       for f in filenames 
-                      if f.endswith(".tif") and ("merged" in f) and ('_'.join(Path(f).stem.split('_')[1:3]) in flag_ids)]
+                      if f[:-4] in flag_ids]
+
         img_fnames.sort()
 
-        lbl_fnames = [Path(dirpath) / f 
-                      for (dirpath, dirnames, filenames) in os.walk(Path(src_dir) / self.dataset_name) 
+        lbl_fnames = [Path(dirpath) / f
+                      for (dirpath, dirnames, filenames) in os.walk(Path(src_dir) / self.dataset_name / 'labels')
                       for f in filenames 
-                      if f.endswith(".tif") and ("mask" in f) and ('_'.join(Path(f).stem.split('_')[1:3]).split(".")[0] in flag_ids)]
+                      if f[:-4] in flag_ids]
+
         lbl_fnames.sort()
 
         if self.usage in ["train", "validation"]:
@@ -91,7 +92,7 @@ class CropData(Dataset):
             for img_fname, lbl_fname in tqdm.tqdm(zip(img_fnames, lbl_fnames), 
                                                   total=len(img_fnames)):
                     
-                img_chip = load_data(Path(src_dir) / self.dataset_name / img_fname,
+                img_chip = load_data(Path(src_dir) / self.dataset_name / 'images' / img_fname,
                                      usage=self.usage,
                                      is_label=False,
                                      apply_normalization=self.apply_normalization,
@@ -100,7 +101,7 @@ class CropData(Dataset):
                                      global_stats=global_stats)
                 img_chip = img_chip.transpose((1, 2, 0))
 
-                lbl_chip = load_data(Path(src_dir) / self.dataset_name / lbl_fname, 
+                lbl_chip = load_data(Path(src_dir) / self.dataset_name / 'labels' / lbl_fname, 
                                      usage=self.usage,
                                      is_label=True)
 
@@ -114,7 +115,7 @@ class CropData(Dataset):
 
             for img_fname, lbl_fname in tqdm.tqdm(zip(img_fnames, lbl_fnames),
                                                   total=len(img_fnames)):
-                img_chip, meta = load_data(Path(src_dir) / self.dataset_name / img_fname,
+                img_chip, meta = load_data(Path(src_dir) / self.dataset_name / 'images' / img_fname,
                                            usage=self.usage,
                                            is_label=False,
                                            apply_normalization=self.apply_normalization,
@@ -122,7 +123,7 @@ class CropData(Dataset):
                                            stat_procedure=self.stat_procedure,
                                            global_stats=global_stats)
                 img_chip = img_chip.transpose((1, 2, 0))
-                lbl_chip = load_data(Path(src_dir) / self.dataset_name / lbl_fname, 
+                lbl_chip = load_data(Path(src_dir) / self.dataset_name / 'labels' / lbl_fname, 
                                      usage=self.usage, is_label=True)
                 
                 self.img_chips.append(img_chip)
@@ -130,7 +131,7 @@ class CropData(Dataset):
 
                 self.meta_ls.append(meta)
 
-                img_id = '_'.join(img_fname.stem.split('_')[1:3])
+                img_id = image_fname.stem
                 self.ids.append(img_id)
 
         

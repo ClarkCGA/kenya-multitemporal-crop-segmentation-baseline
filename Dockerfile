@@ -16,6 +16,6 @@ RUN apt-get update
 RUN mkdir /home/workdir
 WORKDIR /home/workdir
 
-EXPOSE 8888
+EXPOSE 8889
 
-ENTRYPOINT ["jupyter", "lab", "--ip='0.0.0.0'", "--port=8888", "--no-browser", "--allow-root"]
+ENTRYPOINT ["jupyter", "lab", "--ip='0.0.0.0'", "--port=8889", "--no-browser", "--allow-root"]

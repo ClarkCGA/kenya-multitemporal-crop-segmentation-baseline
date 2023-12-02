@@ -154,3 +154,29 @@ def re_scale(img, label, scale=(0.75, 1.5), crop_strategy="center"):
         canvas_label[x_off: x_off + resize_h, y_off: y_off + resize_w] = resampled_label
 
     return canvas_img, canvas_label
+
+def random_crop(img, label, size=(224, 224)):
+    """
+    Randomly crops the image and its corresponding mask to the specified size.
+
+    Parameters:
+    img (numpy.ndarray): The image to be cropped.
+    mask (numpy.ndarray): The corresponding mask to be cropped.
+    size (tuple): The target size of the crop (width, height).
+
+    Returns:
+    numpy.ndarray: Cropped image.
+    numpy.ndarray: Cropped mask.
+    """
+
+    width, height = size
+    if img.shape[1] < width or img.shape[0] < height:
+        raise ValueError("Crop size is larger than the image dimensions.")
+
+    x = random.randint(0, img.shape[1] - width)
+    y = random.randint(0, img.shape[0] - height)
+
+    img_cropped = img[y:y + height, x:x + width, :]
+    label_cropped = label[y:y + height, x:x + width]
+
+    return img_cropped, label_cropped
