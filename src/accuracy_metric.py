@@ -117,13 +117,13 @@ class Evaluator(object):
 
     def plot_confusion_matrix(self, class_mapping, save_path="confusion_matrix.png"):
         # Remove the first row and column
-        conf_mat_without_unknown = self.confusion_matrix[1:, 1:]
+        conf_mat_without_unknown = self.confusion_matrix
         
         # Normalize the confusion matrix by row (i.e., by the true class)
         row_sums = conf_mat_without_unknown.sum(axis=1, keepdims=True)
         conf_mat_normalized = np.divide(conf_mat_without_unknown, row_sums, where=row_sums!=0)
         
-        classes = [class_mapping[i] for i in range(1, self.num_class)]
+        classes = [class_mapping[i] for i in range(0, self.num_class)]
 
         # Create a dataframe for the seaborn heatmap
         df_cm = pd.DataFrame(conf_mat_normalized,

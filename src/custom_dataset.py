@@ -122,7 +122,7 @@ class CropData(Dataset):
                                            normal_strategy=self.normal_strategy,
                                            stat_procedure=self.stat_procedure,
                                            global_stats=global_stats)
-                img_chip = img_chip.transpose((1, 2, 0))
+                img_chip = img_chip.transpose((1, 2, 0)) # Get only first 3 bands, ignore alpha
                 lbl_chip = load_data(Path(src_dir) / self.dataset_name / 'labels' / lbl_fname, 
                                      usage=self.usage, is_label=True)
                 
@@ -131,7 +131,7 @@ class CropData(Dataset):
 
                 self.meta_ls.append(meta)
 
-                img_id = image_fname.stem
+                img_id = img_fname.stem
                 self.ids.append(img_id)
 
         

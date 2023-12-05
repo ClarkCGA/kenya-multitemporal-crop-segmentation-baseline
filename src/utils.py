@@ -111,15 +111,21 @@ def get_labels_distribution(dataset, num_classes=14, ignore_class=0):
     return labels_count
 
 
-def plot_labels_distribution(labels_count, num_classes=14, ignore_class=0):
+def plot_labels_distribution(labels_count, num_classes=14, ignore_class=0, usage="Training", filename=None):
     labels = list(range(num_classes))
     if ignore_class is not None:
         labels.remove(ignore_class)
     plt.bar([str(i) for i in labels], labels_count[labels].numpy())
     plt.xlabel("Class Label")
     plt.ylabel("Frequency")
-    plt.title("Class Distribution (ignoring class {})".format(ignore_class))
-    plt.show()
+    if ignore_class:
+        plt.title(f"Class Distribution of {usage} Dataset (ignoring class {ignore_class})".format(usage, ignore_class))
+    else:
+        plt.title(f"Class Distribution of {usage} Dataset")
+    if filename:
+        plt.savefig(filename)
+    else:
+        plt.show()
 
 
 def pickle_dataset(dataset, file_path):
@@ -157,27 +163,27 @@ def show_random_patches(dataset, sample_num, rgb_bands=(3, 2, 1)):
                    3 : "HLS-L band 5 (NIR)"}
     """
     # Make a deep copy of the dataset for static augmentation.
-    # static_dataset = list(dataset)
+    static_dataset = list(dataset)
 
-    #if len(rgb_bands) != 3 or any(not isinstance(b, int) for b in rgb_bands) or not (1 <= sample_num <= len(static_dataset)):
-        # del static_dataset
-     #   raise ValueError("'sample_num' or 'rgb_bands' are not properly defined")
+    if len(rgb_bands) != 3 or any(not isinstance(b, int) for b in rgb_bands) or not (1 <= sample_num <= len(static_dataset)):
+         del static_dataset
+         raise ValueError("'sample_num' or 'rgb_bands' are not properly defined")
 
     # Select random samples
-    sample_indices = np.random.choice(len(dataset), size=sample_num, replace=False)
+    sample_indices = np.random.choice(len(static_dataset), size=sample_num, replace=False)
 
     fig, axs = plt.subplots(nrows=sample_num, ncols=2, figsize=(16, sample_num * 16 / 2), squeeze=False)
 
     for i, sample_index in enumerate(sample_indices):
         # Get RGB data and normalize if necessary
-        rgb_data = dataset[sample_index][0][list(rgb_bands),:,:].permute(1, 2, 0) 
+        rgb_data = static_dataset[sample_index][0][list(rgb_bands),:,:].permute(1, 2, 0)
         if rgb_data.max() > 1:
             rgb_data = rgb_data.int()
 
         axs[i, 0].set_title(f'Image Patch #{sample_index}')
         axs[i, 0].imshow(rgb_data)
 
-        label_data = dataset[sample_index][1]
+        label_data = static_dataset[sample_index][1]
         im = axs[i, 1].imshow(label_data)
         axs[i, 1].set_title(f'Label Patch #{sample_index}')
         
@@ -186,7 +192,7 @@ def show_random_patches(dataset, sample_num, rgb_bands=(3, 2, 1)):
 
     plt.tight_layout()
     plt.show()
-    # del static_dataset
+    del static_dataset
 
 
 def calculate_global_class_weights(src_dir, dataset_name, ignore_index=0, num_classes=14):

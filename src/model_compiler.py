@@ -208,7 +208,10 @@ class ModelCompiler:
         """
 
         # inparams = torch.load(self.params_init, map_location='cuda:0')
-        inparams = torch.load(self.params_init)
+        if self.params_init.endswith(".tar"):
+            inparams = torch.load(self.params_init)["state_dict"]
+        else:
+            inparams = torch.load(self.params_init)
 
         model_dict = self.model.state_dict()
 
@@ -393,6 +396,15 @@ class ModelCompiler:
                             "train loss": train_loss,
                             "Evaluation loss": val_loss},
                            os.path.join(self.checkpoint_dirpath, f"{t + 1}_checkpoint.pth.tar"))
+            if val_loss[t] == min(val_loss):
+                torch.save({"epoch": t + 1,
+                            "state_dict": self.model.state_dict() if len(self.gpu_devices) > 1 else \
+                                self.model.module.state_dict(),
+                            "scheduler": scheduler.state_dict(),
+                            "optimizer": optimizer.state_dict(),
+                            "train loss": train_loss,
+                            "Evaluation loss": val_loss},
+                           os.path.join(self.checkpoint_dirpath, "best_model_checkpoint.pth.tar"))
 
         writer.close()
 
