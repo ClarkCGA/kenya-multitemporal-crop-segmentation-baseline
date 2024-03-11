@@ -1,0 +1,93 @@
+
+# Custom dataset params
+src_dir: /home/data
+train_dataset_name: kenya
+train_csv_path: /home/workdir/train_ids.csv
+val_csv_path: /home/workdir/validate_ids.csv
+test_csv_path: /home/workdir/test_ids.csv
+apply_normalization: true
+normal_strategy: z_value
+stat_procedure: gpb
+global_stats:
+  min: [0.0, 0.0, 0.0, 0.0]
+  max: [255.0, 255.0, 255.0, 255.0]
+  mean: [112.1533, 114.1895, 92.9912, 254.9901]
+  std: [39.2668, 34.4827, 34.6238, 1.5245]
+transformations:
+- v_flip
+- h_flip
+- d_flip
+aug_params:
+  rotation_degree : (-90, 90)
+
+# DataLoader
+train_BatchSize: 4
+val_test_BatchSize: 4
+
+# Model initialization params
+n_classes: 3
+input_channels: 4
+filter_config: [64, 128, 256, 512, 1024, 1024]
+use_skipAtt: true
+train_dropout_rate: 0.15
+
+# Model compiler params
+working_dir: /home/workdir
+out_dir: kenya_output_skipatt_smooth2
+class_mapping:
+  0: Unknown
+  1: Building Footprint
+  2: Field Boundary
+gpuDevices:
+- 0
+init_type: kaiming
+params_init: null
+freeze_params: null
+
+# Model fitting
+epochs: 100
+optimizer: sam
+LR: 0.011
+LR_policy: PolynomialLR
+criterion:
+    name: TverskyFocalLoss
+    weight:
+    ignore_index: -1
+    gamma: 0.9
+
+momentum: 0.95
+checkpoint_interval: 20
+resume:
+resume_epoch: null
+lr_prams:
+  # StepLR & MultiStepLR
+  step_size: 3
+  milestones:
+  - 5
+  - 10
+  - 20
+  - 35
+  - 50
+  - 70
+  - 90
+  gamma: 0.98
+  # ReduceLROnPlateau
+  mode: triangular
+  factor: 0.8
+  patience: 3
+  threshold: 0.0001
+  threshold_mode: rel
+  min_lr: 3.0e-06
+  # PolynomialLR
+  max_decay_steps: 80
+  min_learning_rate: 1.0e-04
+  power: 0.85
+  # CyclicLR
+  base_lr: 3.0e-05
+  max_lr: 0.01
+  step_size_up: 1100
+  
+# Accuracy assessment
+val_metric_fname: validate_metrics_kenya_reclass.csv
+
+
