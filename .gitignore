@@ -4,4 +4,5 @@ src/**/*.ipynb_checkpoints/
 src/**/__pycache__/
 notebooks/**/*.ipynb_checkpoints/
 output*/
+.Trash-0/*
 **/.DS_Store

@@ -72,7 +72,6 @@ class CropData(Dataset):
                       for (dirpath, dirnames, filenames) in os.walk(Path(src_dir) / self.dataset_name / 'images')
                       for f in filenames 
                       if f[:-4] in flag_ids]
-
         img_fnames.sort()
 
         lbl_fnames = [Path(dirpath) / f
@@ -83,13 +82,11 @@ class CropData(Dataset):
         lbl_fnames.sort()
 
         if self.usage in ["train", "validation"]:
-
             self.img_chips = []
             self.lbl_chips = []
 
             for img_fname, lbl_fname in tqdm.tqdm(zip(img_fnames, lbl_fnames), 
-                                                  total=len(img_fnames)):
-                    
+                                                  total=len(img_fnames)):  
                 img_chip = load_data(Path(src_dir) / self.dataset_name / 'images' / img_fname,
                                      usage=self.usage,
                                      is_label=False,
