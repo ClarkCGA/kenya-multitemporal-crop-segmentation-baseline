@@ -19,15 +19,20 @@ $ docker build -t <image_name>:<tag> .
 ```
 Example:
 ```
-$ docker build -t semseg_baseline:v1 .
+$ docker build -t kenya_sam:1.0 .
 ```
 
 **step 3-** Run the Docker image as a container from within the cloned folder:
 ```
 $ docker run --gpus all -it -p 8888:8888 -v <path/to/the/cloned-repo/on-host>:/app/ <image_name>:<tag>
 ```
+or alternately use docker compose:
 
-This command will start a container based on the specified Docker image and starts a JupyterLab session. Type `localhost:8888` in your browser and copy the provided token from the terminal to open the JupyterLab.
+```
+docker compose up
+```
+
+Either command will start a container based on the specified Docker image and starts a JupyterLab session. Type `localhost:8888` in your browser and copy the provided token from the terminal to open the JupyterLab.
 
 **step 4-** Run the pipeline:
 
