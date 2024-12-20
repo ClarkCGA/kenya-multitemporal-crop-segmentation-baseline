@@ -1,5 +1,7 @@
 jupyterlab
 ipywidgets
+jupyter_ai==0.6.1
+jupyter_ai_magics==0.6.1
 matplotlib==3.7.1
 seaborn==0.12.2
 numpy==1.22.3

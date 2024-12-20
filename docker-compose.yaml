@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  notebook:
+    build: .
+    ports:
+      - "8897:8888"
+    volumes:
+      - ..:/app
+    shm_size: '2gb'
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AI21_API_KEY=<you-ai21-api-key>
+      - ANTHROPIC_API_KEY=<you-anthropic-api-key>
+      - COHERE_API_KEY=<you-cohere-api-key>
+      - HUGGINGFACEHUB_API_TOKEN=<you-huggingfacehub-api-token>
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+              
+
